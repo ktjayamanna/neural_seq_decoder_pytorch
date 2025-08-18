@@ -22,11 +22,9 @@
         "vscode": {
             "extensions": [
                 "ms-python.python",
-                "ms-python.pylint",
                 "ms-python.black-formatter",
                 "ms-toolsai.jupyter",
                 "augment.vscode-augment",
-                "github.vscode-pull-request-github"
             ],
             "settings": {
                 "python.defaultInterpreterPath": "/opt/conda/bin/python",
