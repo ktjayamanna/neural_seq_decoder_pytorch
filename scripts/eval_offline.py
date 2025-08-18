@@ -38,7 +38,14 @@ from neural_decoder.dataset import SpeechDataset
 from neural_decoder.neural_decoder_trainer import loadModel
 
 # Import only what we need to avoid tensorflow dependency
-import lm_decoder
+try:
+    import lm_decoder
+    LM_DECODER_AVAILABLE = True
+except ImportError:
+    print("Warning: lm_decoder module not available. Language model decoding will be disabled.")
+    LM_DECODER_AVAILABLE = False
+    lm_decoder = None
+
 import neural_decoder.utils.rnnEval as rnnEval
 
 
