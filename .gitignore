@@ -162,5 +162,24 @@ cython_debug/
 # data
 data/competitionData/
 data/pickledData/
+data/models/
 outputs/
 logs/
+backup
+
+src/LanguageModelDecoder/*
+
+#test directories and reference outputs
+*.stdout
+*.stderr
+*.bo
+
+# Documentation assets
+*.pdf
+
+# Large test/generated files
+*.npy
+
+# Additional compressed test files
+*.gz
+
