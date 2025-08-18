@@ -12,3 +12,7 @@ pip install -e .
 1. Convert the speech BCI dataset using [formatCompetitionData.ipynb](./notebooks/formatCompetitionData.ipynb)
 2. Train model: `python ./scripts/train_model.py`
 
+#System Diagram
+![System Diagram](./SystemDiagram.png)
+
+
