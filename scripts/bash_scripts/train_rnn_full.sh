@@ -16,8 +16,18 @@ echo ""
 echo "WARNING: Training will create files in visible locations:"
 echo "  - Model files: $OUTPUT_DIR"
 echo "  - Training logs: $LOG_DIR"
+echo "  - TensorBoard logs: $OUTPUT_DIR/tensorboard_logs"
 echo "  - This will take several hours and create large files!"
 echo "  - Monitor disk space during training!"
+echo ""
+echo "MONITORING TRAINING PROGRESS:"
+echo "  To view training metrics with TensorBoard:"
+echo "  1. Open a new terminal"
+echo "  2. Run: tensorboard --logdir $OUTPUT_DIR/tensorboard_logs"
+echo "  3. Open http://localhost:6006 in your browser"
+echo "  4. You'll see training loss and validation CER"
+echo ""
+echo "NOTE: TensorBoard logs are minimal and overwrite previous runs to save space"
 echo ""
 
 mkdir -p "$OUTPUT_DIR"
@@ -32,7 +42,7 @@ args['outputDir'] = '${OUTPUT_DIR}'
 args['datasetPath'] = '${PICKLE_PATH}'
 args['seqLen'] = 150
 args['maxTimeSeriesLen'] = 1200
-args['batchSize'] = 64
+args['batchSize'] = 32
 args['lrStart'] = 0.02
 args['lrEnd'] = 0.02
 args['nUnits'] = 1024
@@ -63,5 +73,10 @@ echo "Full training completed!"
 echo "Files created:"
 echo "  Model: $OUTPUT_DIR"
 echo "  Logs: $LOG_DIR/training.log"
+echo "  TensorBoard logs: $OUTPUT_DIR/tensorboard_logs"
 echo ""
 echo "To check disk usage: du -sh $OUTPUT_DIR $LOG_DIR"
+echo ""
+echo "To view training metrics:"
+echo "  tensorboard --logdir $OUTPUT_DIR/tensorboard_logs"
+echo "  Then open http://localhost:6006 in your browser"

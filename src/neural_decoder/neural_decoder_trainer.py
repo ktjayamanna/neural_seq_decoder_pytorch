@@ -8,6 +8,7 @@ import numpy as np
 import torch
 from torch.nn.utils.rnn import pad_sequence
 from torch.utils.data import DataLoader
+from torch.utils.tensorboard import SummaryWriter
 
 from .model import GRUDecoder
 from .dataset import SpeechDataset
@@ -60,6 +61,25 @@ def trainModel(args):
     torch.manual_seed(args["seed"])
     np.random.seed(args["seed"])
     device = "cuda"
+
+    # Initialize TensorBoard logging (minimal, space-efficient)
+    tensorboard_dir = os.path.join(args["outputDir"], "tensorboard_logs")
+    # Remove existing logs to avoid accumulation
+    if os.path.exists(tensorboard_dir):
+        import shutil
+        shutil.rmtree(tensorboard_dir)
+    os.makedirs(tensorboard_dir, exist_ok=True)
+
+    # Configure writer to minimize disk usage
+    writer = SummaryWriter(
+        log_dir=tensorboard_dir,
+        flush_secs=30,  # Flush less frequently to reduce I/O
+        max_queue=10    # Smaller queue to reduce memory usage
+    )
+
+    print(f"TensorBoard logs: {tensorboard_dir}")
+    print(f"To monitor: tensorboard --logdir {tensorboard_dir}")
+    print("")
 
     with open(args["outputDir"] + "/args", "wb") as file:
         pickle.dump(args, file)
@@ -135,6 +155,10 @@ def trainModel(args):
         )
         loss = torch.sum(loss)
 
+        # Log training loss only every 10 batches to save space
+        if batch % 10 == 0:
+            writer.add_scalar('Loss/Train', loss.item(), batch)
+
         # Backpropagation
         optimizer.zero_grad()
         loss.backward()
@@ -194,6 +218,11 @@ def trainModel(args):
                 avgDayLoss = np.sum(allLoss) / len(testLoader)
                 cer = total_edit_distance / total_seq_length
 
+                # Log only essential validation metrics
+                writer.add_scalar('Loss/Val', avgDayLoss, batch)
+                writer.add_scalar('CER/Val', cer, batch)
+                writer.flush()  # Ensure data is written immediately
+
                 endTime = time.time()
                 print(
                     f"batch {batch}, ctc loss: {avgDayLoss:>7f}, cer: {cer:>7f}, time/batch: {(endTime - startTime)/100:>7.3f}"
@@ -211,6 +240,11 @@ def trainModel(args):
 
             with open(args["outputDir"] + "/trainingStats", "wb") as file:
                 pickle.dump(tStats, file)
+
+    # Close TensorBoard writer and clean up
+    writer.close()
+    print(f"\nTraining completed! TensorBoard logs: {tensorboard_dir}")
+    print(f"To view metrics: tensorboard --logdir {tensorboard_dir}")
 
 
 def loadModel(modelDir, nInputLayers=24, device="cuda"):
